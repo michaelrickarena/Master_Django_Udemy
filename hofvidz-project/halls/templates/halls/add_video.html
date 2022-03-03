@@ -1,0 +1,36 @@
+{% extends 'halls/base.html' %}
+{% block content %}
+
+<div class="container">
+
+<h2> Add Video </h2>
+<form method="post">
+	{% csrf_token %}	
+	{% load widget_tweaks %}
+
+	{% for field in form %}
+
+	<div class="form-group {% if field.errors %}alert alert-danger {% endif %}">
+		{{ field.errors }}
+		{{ field.label_tag }}
+		{% render_field field class="form-control" %}
+
+	{% endfor %}
+	</div>
+
+
+
+<button type="submit" value="Create Hall" class="btn btn-primary"> Create </button>
+</form>
+
+<h2> OR </h2>
+
+<form>
+
+	{{ search_form }}
+
+</form>
+
+</div>
+
+{% endblock %}
