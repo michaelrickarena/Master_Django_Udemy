@@ -17,7 +17,8 @@ def home(request):
 	return render(request,'halls/home.html')
 
 def dashboard(request):
-	return render(request,'halls/dashboard.html')
+	halls = Hall.objects.filter(user=request.user)
+	return render(request,'halls/dashboard.html', {'halls': halls})
 
 def add_video(request, pk):
 	form = VideoForm()
@@ -59,8 +60,15 @@ def add_video(request, pk):
 def video_search(request):
 	search_form = SearchForm(request.GET)
 	if search_form.is_valid():
-		return JsonResponse({'hello':search_form.cleaned_data['search_term']})
-	return JsonResponse({'hello':'not working'})
+		encoded_search_term = urllib.parse.quote(search_form.cleaned_data['search_term'])
+		response = requests.get(f'https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=6&q={ encoded_search_term }&key={YOUTUBE_API_KEY}')
+		return JsonResponse(response.json())
+	return JsonResponse({'error':'Not able to validate form'})
+
+class DeleteVideo(generic.DeleteView):
+	model = Video
+	template_name = 'halls/delete_video.html'
+	success_url = reverse_lazy('dashboard')
 
 class SignUp(generic.CreateView):
 	form_class = UserCreationForm
